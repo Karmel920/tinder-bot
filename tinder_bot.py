@@ -1,8 +1,12 @@
 import undetected_chromedriver as uc
-from selenium import webdriver
+# from selenium import webdriver
 from selenium.webdriver.common.by import By
 from time import sleep
 from random import randint, random
+
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
 from config import username, password
 
 
@@ -11,116 +15,77 @@ class TinderBot:
     def __init__(self):
         option = uc.ChromeOptions()
         option.add_experimental_option("prefs", {"profile.default_content_setting_values.geolocation": 1})
-        self.driver = uc.Chrome(options=option)
+        self.driver = uc.Chrome(version_main=108, options=option)
 
     def login(self):
-        self.driver.get('https://tinder.com/pl')
+        self.driver.get('https://tinder.com')
 
-        sleep(2)
+        agreement = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//div[contains(text(),'I decline')]")))
+        agreement.click()
 
-        login_button = self.driver.find_element(By.XPATH, '//*[@id="s1221153819"]/div/div[1]/div/main/div['
-                                                          '1]/div/div/div/div/header/div/div[2]/div[2]/a/div[2]/div['
-                                                          '2]')
+        login_button = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//a[@class='c1p6lbu0 Miw(120px)']")))
         login_button.click()
 
-        sleep(5)
-
-        google_button = self.driver.find_element(By.XPATH, '//*[@id="s1442494255"]/main/div/div[1]/div/div/div['
-                                                           '3]/span/div[1]')
+        google_button = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//div[@role='button']")))
         google_button.click()
 
         base_window = self.driver.window_handles[0]
         self.driver.switch_to.window(self.driver.window_handles[1])
 
-        email_input = self.driver.find_element(By.XPATH, '//*[@id="identifierId"]')
+        email_input = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//input[@id='identifierId']")))
         email_input.send_keys(username)
 
-        go_on_button = self.driver.find_element(By.XPATH, '//*[@id="identifierNext"]/div/button')
+        go_on_button = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//div[@id='identifierNext']")))
         go_on_button.click()
 
-        sleep(5)
-
-        password_input = self.driver.find_element(By.XPATH, '//*[@id="password"]/div[1]/div/div[1]/input')
+        password_input = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//input[@name='Passwd']")))
         password_input.send_keys(password)
 
-        login_button = self.driver.find_element(By.XPATH, '//*[@id="passwordNext"]/div/button/span')
+        login_button = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//div[@id='passwordNext']")))
         login_button.click()
 
         self.driver.switch_to.window(base_window)
 
-        sleep(5)
-        popup_1 = self.driver.find_element(By.XPATH, '//*[@id="s1442494255"]/main/div/div/div/div[3]/button[1]/div['
-                                                     '2]/div[2]')
+        popup_1 = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//button[@aria-label='Allow']")))
         popup_1.click()
 
-        sleep(3)
-        popup_2 = self.driver.find_element(By.XPATH, '//*[@id="s1442494255"]/main/div/div/div/div[3]/button[2]/div['
-                                                     '2]/div[2]')
+        popup_2 = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//button[@aria-label='Not interested']")))
         popup_2.click()
 
-        sleep(3)
-        agreement = self.driver.find_element(By.XPATH, '//*[@id="s1221153819"]/div/div[2]/div/div/div[1]/div['
-                                                       '2]/button/div[2]/div[2]')
-        agreement.click()
-
     def like(self):
-        like_button = self.driver.find_element(By.XPATH, '//*[@id="s1221153819"]/div/div[1]/div/main/div['
-                                                         '1]/div/div/div[1]/div[1]/div/div[4]/div/div['
-                                                         '4]/button/span/span')
+        # like_button = WebDriverWait(bot.driver, 20).until(EC.element_to_be_clickable((By.XPATH, "//main/div/div/div/div/div/div/div[4]/div/div[4]")))
+        like_button = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//main/div/div/div/div/div/div/div[4]/div/div[4]")))
         like_button.click()
 
     def dislike(self):
-        dislike_button = self.driver.find_element(By.XPATH, '//*[@id="s1221153819"]/div/div[1]/div/main/div['
-                                                            '1]/div/div/div[1]/div[1]/div/div[4]/div/div['
-                                                            '2]/button/span/span')
+        dislike_button = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//main/div/div/div/div/div/div/div[4]/div/div[2]")))
         dislike_button.click()
 
     def first_swipe(self):
-        first_swipe = self.driver.find_element(By.XPATH, '// *[ @ id = "s1221153819"] / div / div[1] / div / main / '
-                                                         'div[1] / div / div / div[1] / div[1] / div / div[3] / div /'
-                                                         ' div[4] / button / span / span')
+        first_swipe = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//main/div/div/div/div/div/div/div[3]/div/div[4]")))
         first_swipe.click()
 
     def close_add_popup(self):
-        popup_3 = self.driver.find_element(By.XPATH, '//*[@id="s1442494255"]/main/div/div[2]/button[2]/div[2]/div[2]')
+        popup_3 = WebDriverWait(self.driver, 5).until(EC.element_to_be_clickable((By.XPATH, "//div[contains(text(),'Not interested')]")))
         popup_3.click()
 
     def close_likes_popup(self):
-        popup_4 = self.driver.find_element(By.XPATH, '//*[@id="s1442494255"]/main/div/button[2]/span')
+        popup_4 = WebDriverWait(self.driver, 5).until(EC.element_to_be_clickable((By.XPATH, "//div[contains(text(),'No Thanks')]")))
         popup_4.click()
 
     def close_likes_popup_2(self):
-        popup_5 = self.driver.find_element(By.XPATH, '//*[@id="s1442494255"]/main/div/button[2]/div[2]/div[2]')
+        popup_5 = WebDriverWait(self.driver, 5).until(EC.element_to_be_clickable((By.XPATH, "//span[@class='Pos(r) Z(1)']")))
         popup_5.click()
 
     def close_match(self):
-        match_popup = self.driver.find_element(By.XPATH,'// *[ @ id = "s677621626"] / main / div / div[1] / div / '
-                                                        'div[4]')
+        match_popup = WebDriverWait(self.driver, 5).until(EC.element_to_be_clickable((By.XPATH, "//button[@title='Back to Tinder']")))
         match_popup.click()
 
-    def send_open_message(self):
-        message_input = self.driver.find_element(By.XPATH, '//*[@id="s-344516134"]')
-        message_input.send_keys('Wygladasz na ciekawa i otwarta dziewczyne, nieczesto takie spotykam')
-
-        send_button = self.driver.find_element(By.XPATH, '// *[ @ id = "s677621626"] / main / div / div[1] / div / '
-                                                         'div[3] / div[3] / form / button / span')
-        send_button.click()
-
     def auto_swipe(self):
-        # try:
-        #     self.first_swipe()
-        # except Exception:
-        #     sleep(1)
-        #     try:
-        #         self.close_add_popup()
-        #     except Exception:
-        #         try:
-        #             self.close_likes_popup()
-        #         except Exception:
-        #             try:
-        #                 self.close_likes_popup_2()
-        #             except Exception:
-        #                 self.close_match()
+        try:
+            self.first_swipe()
+        except Exception:
+            pass
 
         left_count, right_count = 0, 0
         while True:
@@ -135,45 +100,50 @@ class TinderBot:
                     self.dislike()
                     left_count += 1
                     print(f'{left_count}th left swipe')
-                sleep(3)
             except Exception:
                 try:
                     self.close_add_popup()
+                    print("popupadd!")
                 except Exception:
                     try:
                         self.close_likes_popup()
+                        print("popup1!")
                     except Exception:
                         try:
                             self.close_likes_popup_2()
+                            print("popup2!")
                         except Exception:
-                            self.close_match()
-
+                            try:
+                                self.close_match()
+                                print("Match!")
+                            except Exception:
+                                break
 
     def message_all(self):
-        matches = self.driver.find_element(By.XPATH, '//*[@id="s-1195660753"]')
-        match = self.driver.find_element(By.XPATH, '// *[ @ id = "s-46830125"] / div[1] / div[3] / a')
+        matches = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "(//button[normalize-space()='Matches'])")))
+        matches.click()
+        match = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//div[@role='tabpanel']//div//div[3]//a")))
         while match:
             match.click()
-            sleep(2)
-            message = self.driver.find_element(By.XPATH, '//*[@id="s-344516134"]')
-            message.send_keys('Wygladasz na ciekawa i otwarta dziewczyne, nieczesto takie spotykam')
-            send_button = self.driver.find_element(By.XPATH, '//*[@id="s1221153819"]/div/div[1]/div/main/div['
-                                                             '1]/div/div/div/div[1]/div/div/div[3]/form/button['
-                                                             '2]/span')
+            message = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, '//textarea[@placeholder="Type a message"]')))
+            message.send_keys('Witam cię kolezanko, jesteś bardzo piękna i ładna, powiedz mi z jakiej jesteś miejscowości')
+            send_button = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//button[@type='submit']")))
             send_button.click()
-            sleep(2)
+            sleep(1)
+            matches = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "(//button[normalize-space()='Matches'])")))
             matches.click()
-            sleep(2)
-            match = self.driver.find_element(By.XPATH, '// *[ @ id = "s-46830125"] / div[1] / div[3] / a')
+            match = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//div[@role='tabpanel']//div//div[3]//a")))
 
 
-bot = TinderBot()
-bot.login()
+# bot = TinderBot()
+# bot.login()
 
 
-# if __name__ == '__main__':
-#     pass
-#     # bot = TinderBot()
-#     # bot.login()
-#     # bot.auto_swipe()
-
+if __name__ == '__main__':
+    bot = TinderBot()
+    bot.login()
+    while True:
+        try:
+            bot.auto_swipe()
+        except Exception:
+            break
