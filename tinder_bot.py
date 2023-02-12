@@ -1,9 +1,8 @@
-import undetected_chromedriver as uc
-# from selenium import webdriver
-from selenium.webdriver.common.by import By
 from time import sleep
 from random import randint, random
 
+import undetected_chromedriver as uc
+from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
@@ -29,6 +28,7 @@ class TinderBot:
         google_button = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//div[@role='button']")))
         google_button.click()
 
+        sleep(1)
         base_window = self.driver.window_handles[0]
         self.driver.switch_to.window(self.driver.window_handles[1])
 
@@ -53,12 +53,11 @@ class TinderBot:
         popup_2.click()
 
     def like(self):
-        # like_button = WebDriverWait(bot.driver, 20).until(EC.element_to_be_clickable((By.XPATH, "//main/div/div/div/div/div/div/div[4]/div/div[4]")))
-        like_button = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//main/div/div/div/div/div/div/div[4]/div/div[4]")))
+        like_button = WebDriverWait(self.driver, 20).until(EC.element_to_be_clickable((By.XPATH, "//main/div/div/div/div/div/div/div[4]/div/div[4]")))
         like_button.click()
 
     def dislike(self):
-        dislike_button = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//main/div/div/div/div/div/div/div[4]/div/div[2]")))
+        dislike_button = WebDriverWait(self.driver, 20).until(EC.element_to_be_clickable((By.XPATH, "//main/div/div/div/div/div/div/div[4]/div/div[2]")))
         dislike_button.click()
 
     def first_swipe(self):
@@ -82,18 +81,26 @@ class TinderBot:
         match_popup.click()
 
     def auto_swipe(self):
+        is_match = 0
+        left_count, right_count = 0, 0
+
         try:
             self.first_swipe()
+            right_count += 1
+            print(f'{right_count}th right swipe')
         except Exception:
             pass
 
-        left_count, right_count = 0, 0
         while True:
             sleep(randint(1, 3))
             try:
                 n = random()
                 if n < .75:
-                    self.like()
+                    if is_match == 1:
+                        self.first_swipe()
+                        is_match = 0
+                    elif is_match == 0:
+                        self.like()
                     right_count += 1
                     print(f'{right_count}th right swipe')
                 else:
@@ -104,46 +111,58 @@ class TinderBot:
                 try:
                     self.close_add_popup()
                     print("popupadd!")
+                    sleep(0.5)
+                    continue
                 except Exception:
-                    try:
-                        self.close_likes_popup()
-                        print("popup1!")
-                    except Exception:
-                        try:
-                            self.close_likes_popup_2()
-                            print("popup2!")
-                        except Exception:
-                            try:
-                                self.close_match()
-                                print("Match!")
-                            except Exception:
-                                break
+                    pass
+                try:
+                    self.close_likes_popup()
+                    print("popup1!")
+                    sleep(0.5)
+                    continue
+                except Exception:
+                    pass
+                try:
+                    self.close_match()
+                    is_match = 1
+                    print("Match!")
+                    sleep(0.5)
+                    continue
+                except Exception:
+                    pass
+                try:
+                    self.close_likes_popup_2()
+                    print("popup2!")
+                    sleep(0.5)
+                    continue
+                except Exception:
+                    print('End of swiping!')
+                    return
 
     def message_all(self):
-        matches = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "(//button[normalize-space()='Matches'])")))
-        matches.click()
-        match = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//div[@role='tabpanel']//div//div[3]//a")))
-        while match:
-            match.click()
-            message = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, '//textarea[@placeholder="Type a message"]')))
-            message.send_keys('Witam cię kolezanko, jesteś bardzo piękna i ładna, powiedz mi z jakiej jesteś miejscowości')
-            send_button = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//button[@type='submit']")))
-            send_button.click()
-            sleep(1)
+        try:
             matches = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "(//button[normalize-space()='Matches'])")))
             matches.click()
             match = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//div[@role='tabpanel']//div//div[3]//a")))
-
-
-# bot = TinderBot()
-# bot.login()
-
-
-if __name__ == '__main__':
-    bot = TinderBot()
-    bot.login()
-    while True:
-        try:
-            bot.auto_swipe()
+            while match:
+                match.click()
+                message = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, '//textarea[@placeholder="Type a message"]')))
+                message.send_keys('Witam cię kolezanko, jesteś bardzo piękna i ładna, powiedz mi z jakiej jesteś miejscowości')
+                send_button = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//button[@type='submit']")))
+                send_button.click()
+                sleep(1)
+                matches = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "(//button[normalize-space()='Matches'])")))
+                matches.click()
+                match = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//div[@role='tabpanel']//div//div[3]//a")))
         except Exception:
-            break
+            return
+
+
+bot = TinderBot()
+bot.login()
+
+
+# if __name__ == '__main__':
+#     bot = TinderBot()
+#     bot.login()
+#     bot.auto_swipe()
