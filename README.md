@@ -12,6 +12,7 @@ _password_ = 'your_password'
 to run:
 * open terminal
 * `python -i tinder_bot.py`
+* then call `bot.auto_swipe` or `bot.message_all`
 
 ## Features:
 - Login to the app
