@@ -9,6 +9,10 @@ create a `config.py` and add variables:<br >
 _username_ = 'your_username'<br >
 _password_ = 'your_password'
 
+to run:
+* open terminal
+* `python -i tinder_bot.py`
+
 ## Features:
 - Login to the app
 - Autoswiping
