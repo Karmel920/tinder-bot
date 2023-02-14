@@ -81,7 +81,7 @@ class TinderBot:
         match_popup.click()
 
     def auto_swipe(self):
-        is_match = 0
+        is_match = False
         left_count, right_count = 0, 0
 
         try:
@@ -96,10 +96,10 @@ class TinderBot:
             try:
                 n = random()
                 if n < .75:
-                    if is_match == 1:
+                    if is_match:
                         self.first_swipe()
                         is_match = 0
-                    elif is_match == 0:
+                    else:
                         self.like()
                     right_count += 1
                     print(f'{right_count}th right swipe')
@@ -110,21 +110,21 @@ class TinderBot:
             except Exception:
                 try:
                     self.close_add_popup()
-                    print("popupadd!")
+                    # print("popupadd!")
                     sleep(0.5)
                     continue
                 except Exception:
                     pass
                 try:
                     self.close_likes_popup()
-                    print("popup1!")
+                    # print("popup1!")
                     sleep(0.5)
                     continue
                 except Exception:
                     pass
                 try:
                     self.close_match()
-                    is_match = 1
+                    is_match = True
                     print("Match!")
                     sleep(0.5)
                     continue
@@ -132,7 +132,7 @@ class TinderBot:
                     pass
                 try:
                     self.close_likes_popup_2()
-                    print("popup2!")
+                    # print("popup2!")
                     sleep(0.5)
                     continue
                 except Exception:
@@ -146,10 +146,7 @@ class TinderBot:
             match = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//div[@role='tabpanel']//div//div[3]//a")))
             while match:
                 match.click()
-                message = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, '//textarea[@placeholder="Type a message"]')))
-                message.send_keys('Witam cię kolezanko, jesteś bardzo piękna i ładna, powiedz mi z jakiej jesteś miejscowości')
-                send_button = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//button[@type='submit']")))
-                send_button.click()
+                self.send_message(mess=open_message)
                 sleep(1)
                 matches = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "(//button[normalize-space()='Matches'])")))
                 matches.click()
@@ -157,7 +154,19 @@ class TinderBot:
         except Exception:
             return
 
+    def send_message(self, mess=''):
+        try:
+            if not mess:
+                mess = input('Type message: ')
+            message = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, '//textarea[@placeholder="Type a message"]')))
+            message.send_keys(mess)
+            send_button = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//button[@type='submit']")))
+            send_button.click()
+        except Exception:
+            return
 
+
+open_message = 'Witam cię kolezanko, jesteś bardzo piękna i ładna, powiedz mi z jakiej jesteś miejscowości'
 bot = TinderBot()
 bot.login()
 
