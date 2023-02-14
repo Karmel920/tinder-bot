@@ -15,7 +15,7 @@ to run in terminal:
 * `bot.message_all()`
 
 ## Features:
-- Login to the app
+- Login via Google
 - Autoswiping
 - Open message to every match
 
