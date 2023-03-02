@@ -1,5 +1,7 @@
 from time import sleep
 from random import randint, random
+import requests
+import shutil
 
 import undetected_chromedriver as uc
 from selenium.webdriver.common.by import By
@@ -14,7 +16,7 @@ class TinderBot:
     def __init__(self):
         option = uc.ChromeOptions()
         option.add_experimental_option("prefs", {"profile.default_content_setting_values.geolocation": 1})
-        self.driver = uc.Chrome(version_main=108, options=option)
+        self.driver = uc.Chrome(version_main=110, options=option)
 
     def login(self):
         self.driver.get('https://tinder.com')
@@ -28,7 +30,10 @@ class TinderBot:
         google_button = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//div[@role='button']")))
         google_button.click()
 
-        sleep(1)
+        # name = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//span[@itemprop='name']")))
+        # photo = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//div[@aria-label='Profile slider']")))
+
+        sleep(2)
         base_window = self.driver.window_handles[0]
         self.driver.switch_to.window(self.driver.window_handles[1])
 
@@ -164,6 +169,42 @@ class TinderBot:
             send_button.click()
         except Exception:
             return
+
+    # Collect data for learn a neural network
+    def photo_save(self, photo_url, liked):
+        file_name = 'data'
+
+        if liked:
+            file_name += '/likes/'
+        else:
+            file_name += '/dislikes/'
+
+        file_name += photo_url.split('/')[4]
+        file_name += '.jpg'
+
+        res = requests.get(photo_url, stream=True)
+
+        if res.status_code == 200:
+            with open(file_name, 'wb') as f:
+                shutil.copyfileobj(res.raw, f)
+            print('Image sucessfully Downloaded: ', file_name)
+        else:
+            print('Image Couldn\'t be retrieved')
+
+    def get_photo(self):
+        photo = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//div[@class='profileCard__slider__img Z(-1)']")))
+        photo_url = photo.value_of_css_property('background-image')[5:-2]
+        return photo_url
+
+    def photo_stuff(self):
+        photo_url = self.get_photo()
+
+        input_string = input('Write 1 to like, Write 2 to dislike').lower()
+
+        if input_string == '1':
+            self.photo_save(photo_url, True)
+        elif input_string == '2':
+            self.photo_save(photo_url, False)
 
 
 open_message = 'Witam cię kolezanko, jesteś bardzo piękna i ładna, powiedz mi z jakiej jesteś miejscowości'
