@@ -14,7 +14,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-from config import username, password
+from config import gmail, password
 
 
 class TinderBot:
@@ -44,7 +44,7 @@ class TinderBot:
         self.driver.switch_to.window(self.driver.window_handles[1])
 
         email_input = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//input[@id='identifierId']")))
-        email_input.send_keys(username)
+        email_input.send_keys(gmail)
 
         go_on_button = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//div[@id='identifierNext']")))
         go_on_button.click()
