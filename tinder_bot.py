@@ -2,7 +2,13 @@ from time import sleep
 from random import randint, random
 import requests
 import shutil
-
+from PIL import Image
+import tensorflow as tf
+import os
+import cv2
+import matplotlib.pyplot as plt
+from tensorflow.keras.models import load_model
+import numpy as np
 import undetected_chromedriver as uc
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
@@ -99,19 +105,44 @@ class TinderBot:
         while True:
             sleep(randint(1, 3))
             try:
-                n = random()
-                if n < .75:
+                info_button = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(
+                                    (By.XPATH, "(//main/div/div/div/div/div/div/div[2]/div[3]/button)"))
+                              )
+                info_button.click()
+                sleep(1)
+                photo_url = self.get_photo()
+                self.photo_save_eval(photo_url)
+                predict_class = self.photo_predict()
+                back_to_likes = WebDriverWait(bot.driver, 10).until(EC.element_to_be_clickable(
+                    (By.XPATH, "(//main/div/div/div/div/div/div/div/span/a)"))
+                )
+                back_to_likes.click()
+                sleep(1)
+                if predict_class > 0.5:
                     if is_match:
                         self.first_swipe()
                         is_match = 0
                     else:
                         self.like()
                     right_count += 1
-                    print(f'{right_count}th right swipe')
+                    print(f'{predict_class} - {right_count}th right swipe')
                 else:
                     self.dislike()
                     left_count += 1
-                    print(f'{left_count}th left swipe')
+                    print(f'{predict_class} - {left_count}th left swipe')
+                # n = random()
+                # if n < .75:
+                #     if is_match:
+                #         self.first_swipe()
+                #         is_match = 0
+                #     else:
+                #         self.like()
+                #     right_count += 1
+                #     print(f'{right_count}th right swipe')
+                # else:
+                #     self.dislike()
+                #     left_count += 1
+                #     print(f'{left_count}th left swipe')
             except Exception:
                 try:
                     self.close_add_popup()
@@ -146,16 +177,17 @@ class TinderBot:
 
     def message_all(self):
         try:
-            matches = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "(//button[normalize-space()='Matches'])")))
+            matches = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "(//button[normalize-space()='Matches'])[1]")))
             matches.click()
-            match = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//div[@role='tabpanel']//div//div[3]//a")))
+            match = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//ul//li[3]")))
+            # match = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//div[@role='tabpanel']//div//div[3]//a")))
             while match:
                 match.click()
                 self.send_message(mess=open_message)
                 sleep(1)
-                matches = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "(//button[normalize-space()='Matches'])")))
+                matches = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "(//button[normalize-space()='Matches'])[1]")))
                 matches.click()
-                match = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//div[@role='tabpanel']//div//div[3]//a")))
+                match = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//ul//li[3]")))
         except Exception:
             return
 
@@ -169,6 +201,19 @@ class TinderBot:
             send_button.click()
         except Exception:
             return
+
+    def photo_predict(self):
+        img = cv2.imread('eval_photo.jpg')
+        resize_img = tf.image.resize(img, (256, 256))
+        predict_class = new_model.predict(np.expand_dims(resize_img / 255, 0))
+        return predict_class
+
+    def photo_save_eval(self, photo_url):
+        img_data = requests.get(photo_url).content
+        with open('eval_photo.jpg', 'wb') as handler:
+            handler.write(img_data)
+        im = Image.open('eval_photo.jpg').convert("RGB")
+        im.save('eval_photo.jpg', "jpeg")
 
     # Collect data for learn a neural network
     def photo_save(self, photo_url, liked):
@@ -207,6 +252,7 @@ class TinderBot:
             self.photo_save(photo_url, False)
 
 
+new_model = load_model('models/imageclassifier_1051hqphotos.h5')
 open_message = 'Witam cię kolezanko, jesteś bardzo piękna i ładna, powiedz mi z jakiej jesteś miejscowości'
 bot = TinderBot()
 bot.login()
