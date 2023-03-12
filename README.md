@@ -6,7 +6,7 @@
 * `pip install undetected-chromedriver `
 
 create a `config.py` and add variables:<br >
-_username_ = 'your_username'<br >
+_gmail_ = 'your_gmail'<br >
 _password_ = 'your_password'
 
 to run in terminal:
